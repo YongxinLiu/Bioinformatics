@@ -70,18 +70,19 @@ rm test/test.sh # 文件
 # ls s # 多选时提示侯选
 
 # 中止命令 Ctrl+C
-ping -c 4 bic.ac.cn
+ping  bic.ac.cn
 
 
 # fastq文件操作
 
+gzip example.fq
 # 按列表显示文件详细
 ls -lsh example.fq.gz
 
 # 解压缩并保留原压缩文件
 gzip -dk example.fq.gz
 
-ls -l example.fq
+ls -lsh example.fq
 
 # 显示文件前10行
 head example.fq
@@ -110,6 +111,8 @@ grep  'AAAACACAGGAACC.GGGTGAAAAC' example.fa | wc -l
 
 # 匹配 A 或 T
 grep  'AAAACACAGGAACC[AT]GGGTGAAAAC' example.fa | wc -l
+
+grep  'AAAACACAGGAACCAGGGTGAAAAC' example.fa | wc -l
 
 # 统计序列条数
 grep -c '^>' example.fa
@@ -227,10 +230,10 @@ ls A*
 # 中间的那一串字符FRA...-是我们不需要的。观察规律，先按下划线将文件名分割(_)，再获取第1,3个元素；
 # 另外习惯性给生物重复前面也加上下划线（用到了sed的记忆匹配）。
 
-ls A*.gz | cut -f 1,3 -d '_' | sed 's/\([A-E]\)/\1_/'
+ls A*.fq.gz | cut -f 1,3 -d '_' | sed 's/\([A-E]\)/\1_/'
 
 # 把原样品名字与新样品名字对应起来，这里用到了paste和输入重定向 (<)
-paste <(ls A*.gz) <(ls A*.gz | cut -f 1,3 -d '_' | sed 's/\([A-E]\)/\1_/')
+paste <(ls A*.fq.gz) <(ls A*.fq.gz | cut -f 1,3 -d '_' | sed 's/\([A-E]\)/\1_/')
 
 
 # 使用mv直接重命名 （还可以把这个脚本保存下来，保留原始名字和新名字的对应关系，万一操作错了，
@@ -263,6 +266,7 @@ cut -f 3 metadata.txt | tail -n +2 | sort | uniq -c
 # 遍历所有样本
 while IFS= read -r sample; do echo "$sample"; done < <(cut -f 1 metadata.txt | tail -n +2)
 
+for i in `cut -f 1 metadata.txt | tail -n +2`; do echo $i; done
 
 # name.map.txt 是映射表，不是 shell 脚本，不能用 bash 运行。
 
@@ -298,6 +302,8 @@ ACGGTAGCGAGTC
 ACGGAGCGAGCTAGTGCAGCGAGGAGCTGAGTCGAGC
 CAGGACAGGAGCTA
 END
+
+
 # 2. 统计文件中的序列条数。
 # 3. 从 test.fa 中提取 SOX2 的序列。
 #    提示：设置 flag，只打印目标标题之后、下一个标题之前的序列行。
